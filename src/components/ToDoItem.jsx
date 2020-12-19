@@ -18,16 +18,14 @@ export const ToDoItem = (props) => {
     }
   }
 
-  return (
-    <div>
-      <li className="todo-item" key={item.id}>
-      <Checkbox 
-        checked={item.checked}
-        onChange={onCheckItem}
-      >{item.title}</Checkbox>      
-      <Button danger = "true" type = "primary" onClick={onRemoveItem} icon={<DeleteOutlined />}></Button>
-      </li>    
-      <p className="todo-item-desc" >Description: {item.desc}</p>
-    </div>
-  )
+    return (
+        <li className="todo-item" key={item.id}>
+            <div className="todo-item-body">
+                <Checkbox checked={item.checked} onChange={onCheckItem}></Checkbox>
+                <p style={ item.checked ? {'color': 'grey', 'text-decoration': 'line-through'} : {'fontWeight': 'bold'}}>{item.title}, created on: {item.date}</p>
+                <p style={ item.checked ? {'color': 'grey', 'text-decoration': 'line-through'} : {'color': 'green'}}>{"Description: " + item.desc}</p>
+            </div>
+            <Button danger = "true" type = "primary" onClick={onRemoveItem} icon={<DeleteOutlined />}></Button>
+        </li>
+    )
 }
