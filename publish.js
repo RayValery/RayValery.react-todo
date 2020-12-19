@@ -1,2 +1,2 @@
-const gh = require("master");
+const gh = require("gh-pages");
 gh.publish("dist", () => console.log("done"));
