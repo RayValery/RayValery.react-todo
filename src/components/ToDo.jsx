@@ -5,9 +5,9 @@ import { ToDoForm } from './ToDoForm';
 
 export const ToDo = () => {
   const [todos, setTodos] = useState([
-    {id: 1, title: 'React', desc : 'Create React App', checked: false},
-    {id: 2, title: 'Angular', desc : 'Create Angular App', checked: false},
-    {id: 3, title: 'AntDesign', desc : 'Use antd library', checked: false}
+    {id: 1, title: 'React', desc : 'Create React App', date: new Date().getDay() + '.' + new Date().getMonth() + '.'  + new Date().getFullYear() + ' - ' + new Date().getHours() + ':' + new Date().getMinutes(), checked: false},
+    {id: 2, title: 'Angular', desc : 'Create Angular App', date: new Date().getDay() + '.' + new Date().getMonth() + '.'  + new Date().getFullYear() + ' - ' + new Date().getHours() + ':' + new Date().getMinutes(), checked: false},
+    {id: 3, title: 'AntDesign', desc : 'Use antd library', date: new Date().getDay() + '.' + new Date().getMonth() + '.'  + new Date().getFullYear() + ' - ' + new Date().getHours() + ':' + new Date().getMinutes(), checked: false}
   ]);
   const [idCount, setIdCount] = useState(10);
 
@@ -48,17 +48,24 @@ export const ToDo = () => {
     
   }
 
-  const onSubmit = (title, desc) => {
-    const todo = {
-      title,
-      desc,
-      id: idCount,
-      checked: false
-    };
+  const onSubmit = (title, description) => {
+    if (title.length < 3 || description.length < 3)
+      alert("Both title and description should be longer than 3 characters");
+    else if (title[0] !== title[0].toUpperCase())
+      alert("Title should start from capital letter!");
+    else {
+      const todo = {
+        title,
+        description,
+        date: new Date().getDay() + '.' + new Date().getMonth() + '.'  + new Date().getFullYear() + ' - ' + new Date().getHours() + ':' + new Date().getMinutes(),
+        id: idCount,
+        checked: false
+      };
+      setTodos([...todos, todo]);
+      setIdCount(idCount + 1);
+    }
+  }
 
-    setTodos([...todos, todo]);
-    setIdCount(idCount + 1);
-  } 
 
   const removeChecked = () => { 
     
