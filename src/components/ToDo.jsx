@@ -1,110 +1,104 @@
-import React, { useState } from 'react';
-import { Card, Divider, Button } from 'antd';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { Card } from 'antd';
 import { ToDoItem } from './ToDoItem';
 import { ToDoForm } from './ToDoForm';
 
-export const ToDo = () => {
-  const [todos, setTodos] = useState([
-    {id: 1, title: 'React', desc : 'Create React App', date: new Date().getDay() + '.' + new Date().getMonth() + '.'  + new Date().getFullYear() + ' - ' + new Date().getHours() + ':' + new Date().getMinutes(), checked: false},
-    {id: 2, title: 'Angular', desc : 'Create Angular App', date: new Date().getDay() + '.' + new Date().getMonth() + '.'  + new Date().getFullYear() + ' - ' + new Date().getHours() + ':' + new Date().getMinutes(), checked: false},
-    {id: 3, title: 'AntDesign', desc : 'Use antd library', date: new Date().getDay() + '.' + new Date().getMonth() + '.'  + new Date().getFullYear() + ' - ' + new Date().getHours() + ':' + new Date().getMinutes(), checked: false}
-  ]);
-  const [idCount, setIdCount] = useState(10);
+const token = '53db1f9381556dda3ddaaa494fb2137b8ca3b327';
+const config = {
+  headers: { Authorization: `Bearer ${token}` }
+};
 
-  const renderTodoItems = (todos) => {
-    return (
-      <ul className="todo-list">
-        { todos.map(todo => <ToDoItem 
-            key={todo.id}
-            item={todo}
-            onRemove={onRemove} 
-            onCheck={onCheck} 
-          />) }
-      </ul>
-    )
-  }
+export const ToDo = () => {
+  const [todos, setTodos] = useState([]);
+  useEffect(async () => {
+    const result = await axios.get(
+        `https://api.todoist.com/rest/v1/tasks`,
+        config
+    );
+
+    setTodos(result.data);
+  }, []);
 
   const onRemove = (id) => {
     const index = todos.findIndex(todo => todo.id === id);
 
     if (index !== -1) {
+      axios.delete(
+          `https://api.todoist.com/rest/v1/tasks/${id}`,
+          config
+      );
       todos.splice(index, 1);
+      setTodos([...todos]);
+    }
+  }
+
+  const onChange = async (id) => {
+    const index = todos.findIndex(todo => todo.id === id);
+
+    if (index !== -1) {
+      const todo = todos[index];
+
+      await axios.post(
+          `https://api.todoist.com/rest/v1/tasks/${id}`,
+          todo,
+          config
+      );
+
+      todos.splice(index, 1, todo);
       setTodos([...todos]);
     }
   }
 
   const onCheck = (id) => {
     const index = todos.findIndex(todo => todo.id === id);
-    
+
     if (index !== -1) {
       const todo = todos[index];
-    
+
       todo.checked = !todo.checked;
+
+      axios.post(
+          `https://api.todoist.com/rest/v1/tasks/${id}/close`,
+          todo,
+          config
+      );
+
       todos.splice(index, 1, todo);
-      
       setTodos([...todos]);
     }
-
-    
   }
 
-  const onSubmit = (title, description) => {
-    if (title.length < 3 || description.length < 3)
-      alert("Both title and description should be longer than 3 characters");
-    else if (title[0] !== title[0].toUpperCase())
-      alert("Title should start from capital letter!");
-    else {
-      const todo = {
-        title,
-        description,
-        date: new Date().getDay() + '.' + new Date().getMonth() + '.'  + new Date().getFullYear() + ' - ' + new Date().getHours() + ':' + new Date().getMinutes(),
-        id: idCount,
-        checked: false
-      };
-      setTodos([...todos, todo]);
-      setIdCount(idCount + 1);
-    }
+  const onSubmit = async (content) => {
+    const todo = { content };
+
+    const { data } = await axios.post(
+        `https://api.todoist.com/rest/v1/tasks`,
+        todo,
+        config
+    );
+
+    setTodos([...todos, {...todo, id: data.id}]);
   }
 
-
-  const removeChecked = () => { 
-    
-    let i = todos.length;
-    while (i--) {
-      if (todos[i].checked === true) {
-          todos.splice(i, 1);
-      }
-    }
-    
-    setTodos([...todos]);
+  const renderItems = (todos) => {
+    return (
+        <ul className='todo-list'>
+          { todos.map(todo => {
+            return (
+                <ToDoItem item={todo} onCheck={onCheck} onRemove={onRemove} onChange={onChange} />
+            )
+          }) }
+        </ul>
+    )
   }
-
-
-
-  const numberOfUnChecked = () => { 
-
-    let count = 0;
-
-    let i = todos.length;
-    while (i--) {
-      if (todos[i].checked === false) {
-          count++;
-      }
-    }
-
-    return count;
-  }
-
 
   return (
-    <Card title={'ToDo List'} className="todo-card">
-      <ToDoForm onSubmit={onSubmit} />
-      <Divider />
-      { renderTodoItems(todos) }
-      <Divider />
-      <p>Number of Unchecked cards: <p className="todo-numberUnchecked">{numberOfUnChecked()}</p></p>
-      <Divider />
-      <Button danger = "true" htmlType="submit" type="primary" onClick={removeChecked}>Remove checked cards</Button>
-    </Card>
-  );
+      <Card title={'My todo list'}>
+        <ToDoForm onSubmit={onSubmit}/>
+        {
+          renderItems(todos)
+        }
+      </Card>
+  )
 }

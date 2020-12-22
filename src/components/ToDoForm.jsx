@@ -1,29 +1,23 @@
 import React from 'react';
 import { Form, Input, Button } from 'antd';
 
+const { Item } = Form;
+
 export const ToDoForm = (props) => {
-  const { onSubmit } = props;
-  const [form] = Form.useForm();
-  const onFinish = (values) => {
-    if (onSubmit) {
-      onSubmit(values.title, values.desc);
+    const [form] = Form.useForm();
+    const {onSubmit} = props;
+    const finish = (values) => {
+        onSubmit(values.name);
     }
-    form.resetFields();
-  }
 
-  return (
-    <Form className="todo-form" form={form} layout={'inline'} onFinish={onFinish}>
-      <Form.Item name="title" className="todo-form-input">
-        <Input placeholder={'Title'} minLength="3" pattern="[A-Z][a-z]*"/>
-      </Form.Item>
-
-      <Form.Item name="desc" className="todo-form-input">
-        <Input placeholder={'Description'} minLength="3"/>
-      </Form.Item>
-
-      <Form.Item className="todo-form-actions">
-        <Button htmlType="submit" type="primary">Add</Button>
-      </Form.Item>
-    </Form>
-  )
+    return (
+        <Form className={'todo-form'} form={form} layout={'inline'} onFinish={finish}>
+            <Item name={'name'}>
+                <Input placeholder={'Title'} minLength="3" pattern="[A-Z][a-z]*"/>
+            </Item>
+            <Item>
+                <Button htmlType={'submit'}type="primary">Add</Button>
+            </Item>
+        </Form>
+    )
 }
