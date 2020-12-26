@@ -4,7 +4,8 @@ import { Card } from 'antd';
 import { ToDoItem } from './ToDoItem';
 import { ToDoForm } from './ToDoForm';
 
-const token = '53db1f9381556dda3ddaaa494fb2137b8ca3b327';
+const token = '2ed5adf64216b92391a49353efc9e5c029eb8cc8';
+
 const config = {
   headers: { Authorization: `Bearer ${token}` }
 };
